@@ -32,3 +32,6 @@ _deps
 #Executed files
 qHoliday
 *.out
+
+# Apple MacOS files
+.AppleDouble/

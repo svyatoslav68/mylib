@@ -77,11 +77,11 @@ public:
 	PersonsFile(const char *name_file);
 	std::vector<employee> getPersons();
 	void savePersons(std::vector<std::tuple<int, std::string, std::string>> vectorPersons);
-	void saveHolidays(int numRow, std::vector<std::tuple<int, int, int>> holidays);
+	std::vector<PersonsFile::holiday> getHolidays(int number);
+	void saveHolidays(int numRow, const std::vector<holiday> &holidays);
 private:
 	std::string m_name_file;
 	boost::property_tree::ptree tree;
-	std::vector<PersonsFile::holiday> getHolidays(int number);
 };
 
 #endif //STR_FROM_FILE_HPP

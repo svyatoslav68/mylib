@@ -326,6 +326,7 @@ void PersonsFile::savePersons(std::vector<std::tuple<int, std::string, std::stri
 			pt::ptree &child_tree = tree.get_child("FILE.Persons");
 			child_tree.clear();
 			int number = 0;
+			std::cout << "From PersonsFile::savePersons(...)\n";
 			for (auto [ id, position, fio ] : vectorPersons){
 				std::cout << "fio = " << fio.c_str() << std::endl;
 				std::string name_group = boost::lexical_cast<std::string>(++number);
@@ -334,6 +335,7 @@ void PersonsFile::savePersons(std::vector<std::tuple<int, std::string, std::stri
 				child_tree.add(name_group+".position", position);
 				child_tree.add(name_group+".fio", fio);
 			}
+			existException = false;
 		}
 		catch (pt::ptree_bad_path &e){
 			std::cout << "Bad path exception: " << e.what() << "\n";
@@ -343,6 +345,7 @@ void PersonsFile::savePersons(std::vector<std::tuple<int, std::string, std::stri
 		try {
 			boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
 			pt::write_xml(m_name_file, tree, std::locale(), settings);
+			existException = false;
 		}
 		catch (std::exception &e){
 			std::cout << "Bad name file: " << e.what() << std::endl;
@@ -353,17 +356,37 @@ void PersonsFile::savePersons(std::vector<std::tuple<int, std::string, std::stri
 		return;
 }
 
-void PersonsFile::saveHolidays(int numRow, std::vector<std::tuple<int, int, int>> holidays)
+void PersonsFile::saveHolidays(int numRow, const std::vector<holiday> &vectorHolidays)
 {
 	bool existException;
+	existException = false;
 	do {
+			std::string part_name = "FILE.Persons."+boost::lexical_cast<std::string>(numRow)+".Holidays";
 			try {
-				pt::ptree &child_tree = tree.get_child("FILE.Persons."+boost::lexical_cast<std::string>(numRow));
+				pt::ptree &child_tree = tree.get_child(part_name);
+				child_tree.clear();
+				std::cout << "From PersonsFile::saveHolidays(...)\n";
+				for (auto holiday : vectorHolidays) {
+					std::cout << "Holiday from " << holiday.str_date_begin << std::endl;
+					child_tree.add(part_name+".begin", holiday.str_date_begin);
+				}
+				existException = false;
 			}
 			catch (pt::ptree_bad_path &e){
 				std::cout << "Bad path exception: " << e.what() << "\n";
+				tree.put(part_name, "");
+				existException = true;
 			}
-		existException = false;
+			try {
+				boost::property_tree::xml_writer_settings<std::string> settings(' ', 4);
+				pt::write_xml(m_name_file, tree, std::locale(), settings);
+				existException = false;
+			}
+			catch (std::exception &e){
+				std::cout << "Bad name file: " << e.what() << std::endl;
+				m_name_file = "holidays.xml";
+				existException = true;
+			}
 	} while (existException == true); 
 }
 
